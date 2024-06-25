@@ -37,33 +37,31 @@ variables:
   FLASK_APP: app.py
   SQLALCHEMY_DATABASE_URI: postgresql://postgres:postgres@db:5432/cicdsampledatabase
 
-stages:
-- stage: Build_And_Deploy
-  jobs:
-  - job: BuildAndPush
-    displayName: 'Build and Push Docker images'
-    steps:
-  
-    - task: DockerCompose@0
-      displayName: 'Set up Docker Compose'
+jobs:
+- job: BuildAndPush
+  displayName: 'Build and Push Docker images'
+  steps:
 
-    - checkout: apiRepo
+  - task: DockerCompose@0
+    displayName: 'Set up Docker Compose'
 
-    - checkout: dbRepo
+  - checkout: apiRepo
 
-    - checkout: commonRepo
+  - checkout: dbRepo
 
-    - script: |
-        echo "Building Docker images..."
-        docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml build
-      displayName: 'Build Docker images'
+  - checkout: commonRepo
 
-    - script: |
-        echo "Pushing Docker images..."
-        docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml push
-      displayName: 'Push Docker images'
+  - script: |
+      echo "Building Docker images..."
+      docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml build
+    displayName: 'Build Docker images'
 
-    - script: |
-        echo "Starting services..."
-        docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml up -d
-      displayName: 'Start services with Docker Compose'
+  - script: |
+      echo "Pushing Docker images..."
+      docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml push
+    displayName: 'Push Docker images'
+
+  - script: |
+      echo "Starting services..."
+      docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml up -d
+    displayName: 'Start services with Docker Compose'

@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cicdsampledatabase
+    container_name: postgres_db
+    volumes:
+      - ./repository:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  api:
+    build:
+      context: ./api
+    container_name: flask_api
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      FLASK_APP: app.py
+      FLASK_ENV: production
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:postgres@db:5432/cicdsampledatabase
+    ports:
+      - "1234:5000"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

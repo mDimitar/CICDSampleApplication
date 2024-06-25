@@ -22,6 +22,14 @@ resources:
         branches:
           include:
             - main
+    - repository: commonRepo
+      type: github
+      name: mDimitar/CICDSampleApplication
+      endpoint: mDimitar
+      trigger:
+        branches:
+          include:
+            - main
 
 variables:
   DOCKER_COMPOSE_VERSION: '1.27.4'

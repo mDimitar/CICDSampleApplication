@@ -38,7 +38,7 @@ variables:
   SQLALCHEMY_DATABASE_URI: postgresql://postgres:postgres@db:5432/cicdsampledatabase
 
 stages:
-- stage: Build And Deploy
+- stage: Build_And_Deploy
   jobs:
   - job: BuildAndPush
     displayName: 'Build and Push Docker images'

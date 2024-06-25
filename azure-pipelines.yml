@@ -9,6 +9,7 @@ resources:
     - repository: apiRepo
       type: github
       name: mDimitar/CICDFlaskAPI
+      endpoint: MyApiServiceConnection
       trigger:
         branches:
           include:
@@ -16,6 +17,7 @@ resources:
     - repository: dbRepo
       type: github
       name: mDimitar/CICDDatabase
+      endpoint: MyDbServiceConnection
       trigger:
         branches:
           include:

@@ -38,7 +38,7 @@ variables:
   SQLALCHEMY_DATABASE_URI: postgresql://postgres:postgres@db:5432/cicdsampledatabase
 
 stages:
-- stage: Build
+- stage: Build And Deploy
   jobs:
   - job: BuildAndPush
     displayName: 'Build and Push Docker images'
@@ -62,17 +62,6 @@ stages:
         echo "Pushing Docker images..."
         docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml push
       displayName: 'Push Docker images'
-
-- stage: Deploy
-  dependsOn: Build
-  jobs:
-  - job: Deploy
-    displayName: 'Deploy Application'
-    steps:
-    - task: DockerCompose@0
-      displayName: 'Set up Docker Compose'
-
-    - checkout: commonRepo
 
     - script: |
         echo "Starting services..."

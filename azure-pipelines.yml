@@ -1,0 +1,73 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: apiRepo
+      type: github
+      name: mDimitar/CICDFlaskAPI
+      trigger:
+        branches:
+          include:
+            - main
+    - repository: dbRepo
+      type: github
+      name: mDimitar/CICDDatabase
+      trigger:
+        branches:
+          include:
+            - main
+
+variables:
+  DOCKER_COMPOSE_VERSION: '1.27.4'
+  IMAGE_TAG: '$(Build.BuildId)'
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: cicdsampledatabase
+  FLASK_APP: app.py
+  SQLALCHEMY_DATABASE_URI: postgresql://postgres:postgres@db:5432/cicdsampledatabase
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildAndPush
+    displayName: 'Build and Push Docker images'
+    steps:
+  
+    - task: DockerCompose@0
+      displayName: 'Set up Docker Compose'
+
+    - checkout: apiRepo
+
+    - checkout: dbRepo
+
+    - checkout: commonRepo
+
+    - script: |
+        echo "Building Docker images..."
+        docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml build
+      displayName: 'Build Docker images'
+
+    - script: |
+        echo "Pushing Docker images..."
+        docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml push
+      displayName: 'Push Docker images'
+
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+  - job: Deploy
+    displayName: 'Deploy Application'
+    steps:
+    - task: DockerCompose@0
+      displayName: 'Set up Docker Compose'
+
+    - checkout: commonRepo
+
+    - script: |
+        echo "Starting services..."
+        docker compose -f $(Build.SourcesDirectory)/commonRepo/docker-compose.yml up -d
+      displayName: 'Start services with Docker Compose'
